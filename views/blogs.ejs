@@ -1,0 +1,25 @@
+<%- include("partials/header.ejs") %>
+
+<div>
+     <header class="jumbotron" style="height: 510px; background-image: url(https://stockholm7.select-themes.com/wp-content/uploads/2016/04/slide-1.jpg);">
+         <div class="text-center">
+             <h1>Welcome to Blogify!</h1>
+         </div>
+     </header>
+     <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+        <% blogs.forEach(function(blogs){ %>
+			<div class="card col-md-4 col-sm-6">
+				<img class="card-img-top" src="<%= blogs.image %>">
+				<div class="card-body">
+					<h5 class="card-title"><%= blogs.name %></h5>
+					<p class="card-text"><%= blogs.description %></p>
+					<a href="/blogs" class="btn btn-primary">View full blog</a>
+				</div>
+			</div>
+        <% }); %>
+    </div>
+	<hr style="margin: 50px 50px">
+	<a style="margin-left: 45%; margin-bottom: 50px" class="btn btn-info btn-lg" href="/blogs/new">Create a new Blog!</a>
+</div>
+
+<%- include("partials/footer.ejs") %>
