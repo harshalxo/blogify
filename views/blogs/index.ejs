@@ -6,19 +6,23 @@
              <h1>Welcome to Blogify!</h1>
          </div>
      </header>
-     <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+	<div class="container-fluid">
+		<div class="row text-center d-flex">
         <% blogs.forEach(function(blogs){ %>
-			<div class="card col-md-4 col-sm-6">
+		 <div class="col-md-4 col-sm-6">
+			 <div class="card border-0" id="indexcard">
 				<img class="card-img-top" src="<%= blogs.image %>">
 				<div class="card-body">
-					<h5 class="card-title"><%= blogs.name %></h5>
+					<strong><h3 class="card-title"><%= blogs.name %></h3></strong>
 					<p class="card-text"><%= blogs.description %></p>
 					<a href="/blogs/<%= blogs._id %>" class="btn btn-primary">View full blog</a>
 				</div>
 			</div>
+		 </div>
         <% }); %>
-    </div>
-	<hr style="margin: 50px 50px">
+    	</div>
+	</div>
+	<hr style="margin-bottom: 50px">
 	<a style="margin-left: 45%; margin-bottom: 50px" class="btn btn-info btn-lg" href="/blogs/new">Create a new Blog!</a>
 </div>
 
