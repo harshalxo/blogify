@@ -11,6 +11,9 @@
 .card .card-title {
     padding: 9px;
 }
+.card .card-text {
+    padding: 9px;
+}
 
 #newComment {
 	margin-top: 15px;
@@ -42,4 +45,7 @@ body {
 }
 nav {
 	background-color: white;
+}
+.delete-form {
+	display: inline;
 }

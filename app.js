@@ -4,14 +4,16 @@ var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var passport = require("passport");
 var localStrategy = require("passport-local");
+var methodOverride = require("method-override");
 var Blog = require("./models/blog");
 var Comment = require("./models/comment");
 var User = require("./models/user");
 
-mongoose.connect("mongodb://localhost/blogify", { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect("mongodb://localhost/blogify", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
+app.use(methodOverride("_method"));
 
 // passport configuration
 app.use(require("express-session")({
@@ -49,7 +51,11 @@ app.post("/blogs", isLoggedIn, function(req, res) {
 	var name = req.body.name;
 	var image = req.body.image;
 	var description = req.body.description;
-	var newBlog = {name: name, image: image, description: description};
+	var author = {
+		id: req.user._id,
+		username: req.user.username
+	};
+	var newBlog = {name: name, image: image, description: description, author: author};
 	Blog.create(newBlog, function(err, newBlog) {
 		if(err) {
 			console.log(err);
@@ -79,6 +85,36 @@ app.get("/blogs/:id", function(req, res) {
 	});
 });
 
+app.get("/blogs/:id/edit", checkBlogOwnership, function(req, res) {
+	Blog.findById(req.params.id, function(err, foundBlog) {
+		if(err) {
+			console.log(err);
+		} else {
+			res.render("blogs/edit", {blog: foundBlog});
+		}
+	});
+});
+
+app.put("/blogs/:id", checkBlogOwnership, function(req, res) {
+	Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, editedBlog) {
+		if(err) {
+			console.log(err);
+		} else {
+			res.redirect("/blogs/" + req.params.id);
+		}
+	});
+});
+
+app.delete("/blogs/:id", checkBlogOwnership, function(req, res) {
+	Blog.findByIdAndRemove(req.params.id, function(err) {
+		if(err) {
+			console.log(err);
+		} else {
+			res.redirect("/blogs");
+		}
+	});
+});
+
 // comments
 app.get("/blogs/:id/comments/new", isLoggedIn, function(req, res) {
 	Blog.findById(req.params.id, function(err, foundBlog) {
@@ -100,12 +136,44 @@ app.post("/blogs/:id/comments", isLoggedIn, function(req, res) {
 				if(err) {
 					console.log(err);
 				} else {
+					newComment.author.id = req.user._id;
+					newComment.author.username = req.user.username;
+					newComment.save();
 					foundBlog.comments.push(newComment);
 					foundBlog.save();
 					res.redirect("/blogs/" + foundBlog._id);
 				}
 			});
 		}
+	});
+});
+
+app.get("/blogs/:id/comments/:commentid/edit", function(req, res) {
+	Comment.findById(req.params.commentid, function(err, foundComment) {
+		if(err) {
+			console.log(err);
+		} else {
+			res.render("comments/edit", {blog_id: req.params.id, comment: foundComment});
+		}
+	});
+});
+
+app.put("/blogs/:id/comments/:commentid", function(req, res) {
+	Comment.findByIdAndUpdate(req.params.commentid, req.body.comment, function(err, editedComment) {
+		if(err) {
+			console.log(err);
+		} else {
+			res.redirect("/blogs/" + req.params.id);
+		}
+	});
+});
+
+app.delete("/blogs/:id/comments/:commentid", function(req, res) {
+	Comment.findByIdAndRemove(req.params.commentid, function(err) {
+		if(err) {
+			res.redirect("back");
+		}
+		res.redirect("/blogs/" + req.params.id);
 	});
 });
 
@@ -144,6 +212,48 @@ function isLoggedIn(req, res, next) {
 		return next();
 	}
 	res.redirect("/login");
+}
+
+function checkBlogOwnership(req, res, next) {
+	if(req.isAuthenticated()) {
+		Blog.findById(req.params.id, function(err, foundBlog) {
+			if(err) {
+				console.log(err);
+				res.redirect("back");
+			} else {
+				if(foundBlog.author.id.equals(req.user._id)) {
+					next();
+				}
+				else {
+					res.redirect("back");
+				}
+			}
+		});
+		
+	} else {
+		res.redirect("back");
+	}
+}
+
+function checkCommentOwnership(req, res, next) {
+	if(req.isAuthenticated()) {
+		Comment.findById(req.params.commentid, function(err, foundComment) {
+			if(err) {
+				console.log(err);
+				res.redirect("back");
+			} else {
+				if(foundComment.author.id.equals(req.user._id)) {
+					next();
+				}
+				else {
+					res.redirect("back");
+				}
+			}
+		});
+		
+	} else {
+		res.redirect("back");
+	}
 }
 
 app.listen(3000, function() {
