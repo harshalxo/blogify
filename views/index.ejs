@@ -2,11 +2,11 @@
 <!-- <div class="background-img"></div> -->
 <div class="row text-center background-img" style="padding-top:100px;display:flex; flex-wrap:wrap;">
     <% blogs.forEach(function(blogs){ %>
-	<div class="card col-md-4 col-sm-6">
+	<div class="card col-md-4 col-sm-6" style="height:fit-content;">
 		<img class="card-img-top" src="<%= blogs.image %>">
-		<div class="card-body">
+		<div class="card-body" >
 			<h5 class="card-title"><%= blogs.name %></h5>
-			<p class="card-text"><%= blogs.description %></p>
+			<p class="card-text"><%= blogs.description.substring(0,70) %>...</p>
 			<a href="/blogs/<%= blogs._id %>" class="btn btn-primary">View full blog</a>
 		</div>
 	</div>
