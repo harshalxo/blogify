@@ -1,2 +1,10 @@
-<h1>Your Favorite Blog.</h1>
-<button class="btn btn-lg btn-success"><a href="/blogs">View All Blogs</a></button>
+<%- include("partials/header.ejs") %>
+<header class="jumbotron background-img">
+        <div class="text-center" style="margin-top: 200px;">
+            <h1 style="color: #fff;font-family:Arial, Helvetica, sans-serif;">
+                Welcome to Blogify!
+            </h1>    
+            <button class="btn-lg"><a href="/blogs">View All Blogs</a></button>
+        </div>
+</header>
+<%- include("partials/footer.ejs") %>
