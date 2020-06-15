@@ -10,9 +10,9 @@
                     <p class="card-text"><%= blog.description %></p>
 					<p class="card-text"><em>~ Submitted by <%= blog.author.username %></em></p>
 					<% if(currentUser && blog.author.id.equals(currentUser._id)) { %>
-					<a class="btn btn-xs btn-warning" href="/blogs/<%=blog._id%>/edit">Edit</a>
+					<a class="btn btn-xs btn-outline-warning" href="/blogs/<%=blog._id%>/edit">Edit</a>
 					<form class="delete-form" action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
-						<button class="btn btn-xs btn-danger">Delete</button>
+						<button class="btn btn-xs btn-outline-danger">Delete</button>
 					</form>
 					<% } %>
                 </div>
@@ -20,7 +20,7 @@
             <div class="card custom-card border-0">
 				<h2 class="text-center">Comments</h2>
                 <span class="text-right">
-                    <a id="newComment" class="btn btn-success" href="/blogs/<%=blog._id%>/comments/new">Add New Comment</a>
+                    <a class="btn btn-outline-success mt-2 mr-3" href="/blogs/<%=blog._id%>/comments/new">Add New Comment</a>
                 </span>
                 <hr>
 				<% blog.comments.forEach(function(comment){ %>
@@ -30,9 +30,9 @@
                         <span class="float-right">10 days ago</span>
                         <p><%= comment.text %> </p>
 						<%if(currentUser && comment.author.id.equals(currentUser._id)){%>
-							<a class="btn btn-xs btn-warning" href="/blogs/<%=blog._id%>/comments/<%= comment._id %>/edit">Edit</a>
+							<a class="btn btn-xs btn-outline-warning" href="/blogs/<%=blog._id%>/comments/<%= comment._id %>/edit">Edit</a>
 							<form class="delete-form" action="/blogs/<%=blog._id%>/comments/<%= comment._id %>?_method=DELETE" method="POST">
-								<button class="btn btn-xs btn-danger">Delete</button>
+								<button class="btn btn-xs btn-outline-danger">Delete</button>
 							</form>
 						<% } %>
                     </div>

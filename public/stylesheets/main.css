@@ -19,25 +19,17 @@
 	margin-top: 15px;
 	margin-right: 15px;
 }
-
 .lead {
 	margin-bottom: 0;
 }
-
 #list {
 	margin-top: 2.0rem;
 }
-
 h2 {
 	margin-top: 1.0rem;
 }
-
 #allComments {
 	padding: 10px 20px;
-}
-
-.container-fluid {
-	padding: 50px;
 }
 
 body {

@@ -3,17 +3,21 @@ var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var passport = require("passport");
+var cookieParser = require("cookie-parser");
 var localStrategy = require("passport-local");
-var methodOverride = require("method-override");
+var flash = require("connect-flash");
 var Blog = require("./models/blog");
 var Comment = require("./models/comment");
 var User = require("./models/user");
+var session = require("express-session");
+var methodOverride = require("method-override");
 
 mongoose.connect("mongodb://localhost/blogify", { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
+app.use(cookieParser('secret'));
 
 // passport configuration
 app.use(require("express-session")({
@@ -21,6 +25,8 @@ app.use(require("express-session")({
 	resave: false,
 	saveUninitialized: false
 }));
+
+app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
@@ -28,12 +34,19 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
-   res.locals.currentUser = req.user;
-   next();
+	res.locals.currentUser = req.user;
+	res.locals.success = req.flash('success');
+	res.locals.error = req.flash('error');
+	next();
 });
 
 app.get("/", function(req, res) {
 	res.render("landing");
+});
+
+// about
+app.get("/about", function(req, res) {
+	res.render("about");
 });
 
 // blogs
@@ -60,6 +73,7 @@ app.post("/blogs", isLoggedIn, function(req, res) {
 		if(err) {
 			console.log(err);
 		} else {
+			req.flash("success","Successfully created a Blog post!");
 			res.redirect("/blogs");		
 		}
 	});
@@ -100,6 +114,7 @@ app.put("/blogs/:id", checkBlogOwnership, function(req, res) {
 		if(err) {
 			console.log(err);
 		} else {
+			req.flash("success","Successfully Updated!");
 			res.redirect("/blogs/" + req.params.id);
 		}
 	});
@@ -110,6 +125,7 @@ app.delete("/blogs/:id", checkBlogOwnership, function(req, res) {
 		if(err) {
 			console.log(err);
 		} else {
+			req.flash("error","Successfully deleted the blog post!");
 			res.redirect("/blogs");
 		}
 	});
@@ -141,6 +157,7 @@ app.post("/blogs/:id/comments", isLoggedIn, function(req, res) {
 					newComment.save();
 					foundBlog.comments.push(newComment);
 					foundBlog.save();
+					req.flash('success', 'Created a comment!');
 					res.redirect("/blogs/" + foundBlog._id);
 				}
 			});
@@ -163,6 +180,7 @@ app.put("/blogs/:id/comments/:commentid", function(req, res) {
 		if(err) {
 			console.log(err);
 		} else {
+            req.flash('success', 'Edited the comment successfully');
 			res.redirect("/blogs/" + req.params.id);
 		}
 	});
@@ -173,6 +191,7 @@ app.delete("/blogs/:id/comments/:commentid", function(req, res) {
 		if(err) {
 			res.redirect("back");
 		}
+    	req.flash('error', 'Deleted the comment!');
 		res.redirect("/blogs/" + req.params.id);
 	});
 });
@@ -189,6 +208,7 @@ app.post("/register", function(req, res) {
 			return res.render("register");
 		}
 		passport.authenticate("local")(req, res, function() {
+            req.flash("success", "Successfully Signed Up! Nice to meet you " + req.body.username);
 			res.redirect("/blogs");
 		});
 	});
@@ -204,13 +224,15 @@ app.post("/login", passport.authenticate("local", {
 
 app.get("/logout", function(req, res) {
 	req.logout();
-	res.redirect("/blogs");
+    req.flash("success", "Successfully logged you out");
+	res.redirect("back");
 });
 
 function isLoggedIn(req, res, next) {
 	if(req.isAuthenticated()) {
 		return next();
 	}
+	req.flash("error", "You must be signed in to do that!");
 	res.redirect("/login");
 }
 
@@ -225,12 +247,14 @@ function checkBlogOwnership(req, res, next) {
 					next();
 				}
 				else {
+					req.flash("error", "You don't have permission to do that!");
 					res.redirect("back");
 				}
 			}
 		});
 		
 	} else {
+		req.flash("error", "You need to be signed in to do that!");
 		res.redirect("back");
 	}
 }
@@ -246,12 +270,14 @@ function checkCommentOwnership(req, res, next) {
 					next();
 				}
 				else {
+					req.flash("error", "You don't have permission to do that!");
 					res.redirect("back");
 				}
 			}
 		});
 		
 	} else {
+		req.flash("error", "You need to be signed in to do that!");
 		res.redirect("back");
 	}
 }
