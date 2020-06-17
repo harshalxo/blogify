@@ -31,7 +31,17 @@
 			</div>
 		</nav>
 		
-		<div class="container card border-0" style="padding: 0 50px; background-color: rgba(51, 204, 204, 0.3); width: 50%; padding: 50px">
+		<div class="container">
+       		<% if(error && error.length > 0) { %>
+         		<div style="height: 50px; width: 65%; margin-left: 17.5%" class="alert alert-danger text-center mt-3"><p><%=error %></p></div>
+       		<% } %>
+       
+       		<% if(success && success.length > 0) { %>
+         		<div style="height: 50px; width: 65%; margin-left: 17.5%" class="alert alert-success text-center mt-3"><p><%= success %></p></div>
+       		<% } %>
+    	</div>
+		
+		<div class="container card border-0" style="padding: 0 50px; background-color: rgba(255, 255, 255, 0.3); width: 50%; padding: 50px">
 			<h2 style="margin: 0 25px; text-align: center; color: white; font-size: 60px">Sign Up!</h2>
 			<br>
 			<div style="width: 80%; margin: 0 auto">
