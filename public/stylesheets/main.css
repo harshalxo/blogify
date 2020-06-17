@@ -80,6 +80,7 @@ div #slideSource {
 	padding-top: 40px;
 	padding-bottom: 40px;
 	margin-top: 10%;
+	border-radius: 25px 0;
 }
 
 div #slideSource.fade {
@@ -90,4 +91,5 @@ div #slideSource.fade {
 	padding-top: 40px;
 	padding-bottom: 40px;
 	margin-top: 10%;
+	border-radius: 25px 0;
 }
